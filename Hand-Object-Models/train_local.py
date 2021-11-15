@@ -263,6 +263,14 @@ def restoring_vars(hypes, sess):
                     "conv4_1", "conv4_2", "conv4_3", "pool4",
                     "conv5_1", "conv5_2", "conv5_3", "pool5",
                     "fc6", "fc7"]
+    elif retrain_from == "cp":
+        restoring_vars_names = ["conv1_1", "conv1_2", "pool1", 
+            "conv2_1", "conv2_2", "pool2",
+            "conv3_1", "conv3_2", "conv3_3", "pool3",
+            "conv4_1", "conv4_2", "conv4_3", "pool4",
+            "conv5_1", "conv5_2", "conv5_3", "pool5",
+            "fc6", "fc7", "score_fr", "upscore2",
+            "score_pool4", "upscore4", "score_pool3", "upscore32"]
     else:
         restoring_vars_names = ["conv1_1", "conv1_2", "pool1", 
                     "conv2_1", "conv2_2", "pool2",

@@ -1,24 +1,30 @@
 {
   "model": {
-    "input_file": "../inputs/hand_input.py",
-    "architecture_file" : "../encoder/fcn8_vgg.py",
+    "input_file": "../inputs/local_input.py",
+    "architecture_file" : "../encoder/fcn8_vgg_cp.py",
     "objective_file" : "../decoder/generic_multiloss.py",
     "optimizer_file" : "../optimizer/generic_optimizer.py",
-    "evaluator_file" : "../evals/hand_eval.py"
+    "evaluator_file" : "../evals/local_eval.py"
   },
   "path": ["../incl"],
 
   "data": {
-    "train_file" : "train_hand.txt",
-    "val_file" : "val_hand.txt",
+    "train_file" : "train_GTEA_local.txt",
+    "val_file" : "val_GTEA_local.txt",
     "hand_color1" : [100,100,100],
     "hand_color2" : [150,150,150],
     "hand_color3" : [200,200,200],
     "hand_color4" : [222,222,222],
     "hand_color5" : [255,255,255],
+    "heatmap_color" : [0,0,255],
     "background_color" : [0,0,0],
     "vgg_url": "ftp://mi.eng.cam.ac.uk/pub/mttt2/models/vgg16.npy",
     "kitti_url": ""
+  },
+
+  "transfer": {
+    "model_folder" : "RUNS/hand_model",
+    "model_name" : "model.ckpt-9999"
   },
 
   "arch": {
@@ -28,7 +34,7 @@
     "weight": [1, 1],
     "num_channels" : 3,
     "whitening": false,
-    "retrain_from": "all",
+    "retrain_from": "cp",
     "output": "softmax"
   },
 
@@ -54,20 +60,20 @@
   "logging": {
     "display_iter": 50,
     "eval_iter": 2000,
-    "write_iter": 10000,
-    "save_iter": 10000,
-    "image_iter": 10000
+    "write_iter": 2000,
+    "save_iter": 20000,
+    "image_iter": 2000
   },
 
   "solver": {
       "opt": "Adam",
-      "batch_size": 16,
+      "batch_size": 8,
       "epsilon": 0.000000001,
       "adam_eps": 0.00001,
       "threads": 4,
       "learning_rate": 1e-5,
       "learning_rate_step": null,
-      "max_steps": 10000
+      "max_steps": 20000
   },
   "use_fc_wd": true,
   "loss": "xentropy",

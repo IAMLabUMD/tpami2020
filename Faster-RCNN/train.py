@@ -100,22 +100,6 @@ class Train:
             self.imdb, self.roidb = load_db("tego_train-blind-wholeBB")
         elif dataset == "tego_sighted_wholeBB":
             self.imdb, self.roidb = load_db("tego_train-sighted-wholeBB")
-        elif dataset == "tor-feedback":
-            self. imdb, self.roidb = load_db("tor-feedback_train")
-        elif dataset == "tor-feedback_wholeBB":
-            self. imdb, self.roidb = load_db("tor-feedback_train-wholeBB")
-        elif dataset == "tor-feedback-hand":
-            self. imdb, self.roidb = load_db("tor-feedback_train-hand")
-        elif dataset == "tor-feedback-hand_wholeBB":
-            self. imdb, self.roidb = load_db("tor-feedback_train-hand-wholeBB")
-        elif dataset == "tor-feedback-noshuffle":
-            self. imdb, self.roidb = load_db("tor-feedback_train-noshuffle")
-        elif dataset == "tor-feedback-noshuffle_wholeBB":
-            self. imdb, self.roidb = load_db("tor-feedback_train-noshuffle-wholeBB")
-        elif dataset == "tor-feedback-hand-noshuffle":
-            self. imdb, self.roidb = load_db("tor-feedback_train-hand-noshuffle")
-        elif dataset == "tor-feedback-hand-noshuffle_wholeBB":
-            self. imdb, self.roidb = load_db("tor-feedback_train-hand-noshuffle-wholeBB")
         else:
             self.imdb, self.roidb = combined_roidb("voc_2007_trainval")
 

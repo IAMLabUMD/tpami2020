@@ -80,11 +80,7 @@ class Train:
         else:
             raise NotImplementedError
         
-        if dataset == "gtea":
-            self.imdb, self.roidb = load_db("gtea_train")
-        elif dataset == "gtea-gaze-plus":
-            self.imdb, self.roidb = load_db("gtea-gaze-plus_train")
-        elif dataset == "tego":
+        if dataset == "tego":
             self.imdb, self.roidb = load_db("tego_train")
         elif dataset == "gtea_wholeBB":
             self.imdb, self.roidb = load_db("gtea_train-wholeBB")

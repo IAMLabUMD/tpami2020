@@ -1,0 +1,8 @@
+cython
+opencv-python
+easydict
+Pillow
+matplotlib
+scipy
+numpy
+tensorflow_gpu==1.14.0

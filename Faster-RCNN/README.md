@@ -1,68 +1,121 @@
-# tf-faster-rcnn
-**This repository explains how to train & test your own data on the Faster-RCNN model.**
+# Models built on Faster R-CNN
+This repository builds upon an existing repository that uses the Faster-RCNN model: forked from [dBeker/Faster-RCNN-TensorFlow-Python3](https://github.com/vincent317/Faster-RCNN-TensorFlow-Python3).
 
-# Environment setup list:
-1. Python 3.6
-2. CUDA 10.0
-3. cuDNN 7.4.
-4. tensorflow_gpu-1.14.0
-5. Visual Studio C++ Build Tools 2015
-
-# How to train on your own dataset?
-1. To use this model, you need to change your data to the [VOC2007-like dataset](https://www.programmersought.com/article/65711056356/;jsessionid=421CF30D7DDB52E78C87ABD7477A08E3).
-
-2. Change the label classes on line 33/34 of ```lib/datasets/pascal_voc.py``` (also ```demo.py``` in root folder) to your own classes (**DO NOT DELETE BACKGROUND CLASS**).
-
-3. (Optional) You can change the ```learning rate```, ```max_iters```, etc in ```lib/config/config.py```. However, ```snap_iterations``` need to be **SMALLER** than ```max_iters```.
-
-4. Change ```NETS = {'vgg16': ('vgg16_faster_rcnn_iter_70000.ckpt',), 'res101': ('res101_faster_rcnn_iter_110000.ckpt',)} DATASETS = {'pascal_voc': ('voc_2007_trainval',), 'pascal_voc_0712': ('voc_2007_trainval+voc_2012_trainval',)}```  in ```demo.py``` to  ```NETS = {'vgg16': ('vgg16.ckpt',), 'res101': ('res101_faster_rcnn_iter_110000.ckpt',)} DATASETS = {'pascal_voc': ('voc_2007_trainval',), 'pascal_voc_0712': ('voc_2007_trainval',)}```.
-
-5. Create ```output/vgg16/voc_2007_trainval/default``` folder under the root folder.
-
-6. Run ```train.py``` to start training. 
-
-7. After training, the model will be in ```default/voc_2007_trainval/default```. Copy & rename them to the ```output/vgg16/voc_2007_trainval/default``` folder. 
-
-![Renamed Files](/20191102010907813.jpg)
-
-8. To re-train the model, make sure you delete the files under ```default/voc_2007_trainval/default```, ```output/vgg16/voc_2007_trainval/default```, and ```data/cache```.
+The code was built using Python 3.7 and Tensorflow 1.14.
 
 
-# How to test your trained model?
-1. Put the images you want to test under ```data\demo```.
+# Installation
+## Environment setup
+1. Clone or download this repository.
+2. Change directory to the current folder.
+  ```
+  cd Faster-RCNN
+  ```
+3. Install [pipenv](https://pipenv.pypa.io/en/latest/install/) if not installed.
+4. Activate a virtual environment using pipenv.
+  ```
+  pipenv install
+  ```
+  *(Run the command below if the virtual environment with pipenv is already installed.)*
+  ```
+  pipenv shell
+  ```
+5. Install COCO Python API dependencies.
+  ```
+  cd data/coco/PythonAPI  
+  python setup.py build_ext --inplace
+  python setup.py build_ext install 
+  ```
+6. Install other libraries.
+  ```
+  cd lib/utils
+  python setup.py build_ext --inplace
+  ```
+7. Download the pre-trained VGG16 from [here](http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz) and place it as `data/imagenet_weights/vgg16.ckpt`.
 
-2. Rename the ```im_names``` in ```demo.py``` to the names of the images you want to test.
 
-3. Change ```default='res101'``` on in ```demo.py``` to ```default='vgg16'```.
+## Dataset download
+1. Download TEgO dataset from [here](https://drive.google.com/file/d/1iY4KCEDJFQkc-X9UknzWK9WELUisfutl/view?usp=sharing) and place it in the `data` folder.
+2. Untar `TEgO_with_VOC.tar.gz` in the `data` folder.
 
-4. Run demo.py.
 
-<br>
-<br>
-**Below is the same as the original repository.**
+# Training & Testing
+## TEgO with bounding boxes for object center areas
+A bounding box surrounding an object center area is used to train and test a Faster R-CNN model. Note that each image has up to one object of interest, which center area is annotated with a bounding box.
 
-# How To Use This Branch
-1. Install tensorflow, preferably GPU version. Follow [instructions]( https://www.tensorflow.org/install/install_windows). If you do not install GPU version, you need to comment out all the GPU calls inside code and replace them with relavent CPU ones.
+* Training
+```
+python train.py --dataset tego
+```
 
-2. Checkout this branch
+* Testing
+```
+python evaluate.py tego
+```
 
-3. Install python packages (cython, python-opencv, easydict) by running  
-`pip install -r requirements.txt`   
-(if you are using an environment manager system such as `conda` you should follow its instruction)
+## TEgO with bounding boxes for whole objects
+A bounding box surrounding a whole object is used to train andn test a Faster R-CNN model. Note that each image has up to one object of interest, which is annotated with a bounding box.
+* Training
+```
+python train.py --dataset tego_wholeBB
+```
 
-4. Go to  ./data/coco/PythonAPI  
-Run `python setup.py build_ext --inplace`  
-Run `python setup.py build_ext install`  
-Go to ./lib/utils and run `python setup.py build_ext --inplace`
+* Testing
+```
+python evaluate.py tego_wholeBB
+```
 
-5. Follow [these instructions](https://github.com/rbgirshick/py-faster-rcnn#beyond-the-demo-installation-for-training-and-testing-models) to download PyCoco database.
-I will be glad if you can contribute with a batch script to automatically download and fetch. The final structure has to look like  
-`data\VOCDevkit2007\VOC2007`  
+## TEgO Blind with bounding boxes for object center areas
+Data collected by the blind individual are used. A bounding box surrounding an object center area is used to train and test a Faster R-CNN model. Note that each image has up to one object of interest, which center area is annotated with a bounding box.
 
-1. Download pre-trained VGG16 from [here](http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz) and place it as `data\imagenet_weights\vgg16.ckpt`.  
-For rest of the models, please check [here](https://github.com/tensorflow/models/tree/master/research/slim#pre-trained-models)
+* Training
+```
+python train.py --dataset tego_blind
+```
 
-7. Run train.py
+* Testing
+```
+python evaluate.py tego_blind
+```
 
-Notify me if there is any issue found.
+## TEgO Blind with bounding boxes for whole objects
+Data collected by the blind individual are used. A bounding box surrounding a whole object is used to train andn test a Faster R-CNN model. Note that each image has up to one object of interest, which is annotated with a bounding box.
 
+* Training
+```
+python train.py --dataset tego_blind_wholeBB
+```
+
+* Testing
+```
+python evaluate.py tego_blind_wholeBB
+```
+
+## TEgO Sighted with bounding boxes for object center areas
+Data collected by the sighted individual are used. A bounding box surrounding an object center area is used to train and test a Faster R-CNN model. Note that each image has up to one object of interest, which center area is annotated with a bounding box.
+
+* Training
+```
+python train.py --dataset tego_sighted
+```
+
+* Testing
+```
+python evaluate.py tego_sighted
+```
+
+## TEgO Sighted with bounding boxes for whole objects
+Data collected by the sighted individual are used. A bounding box surrounding a whole object is used to train andn test a Faster R-CNN model. Note that each image has up to one object of interest, which is annotated with a bounding box.
+
+* Training
+```
+python train.py --dataset tego_sighted_wholeBB
+```
+
+* Testing
+```
+python evaluate.py tego_sighted_wholeBB
+```
+
+# Contact
+Please contact us at iamlab@umd.edu if you find any issues.

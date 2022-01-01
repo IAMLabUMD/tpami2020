@@ -5,4 +5,5 @@ Pillow
 matplotlib
 scipy
 numpy
+sklearn
 tensorflow_gpu==1.14.0

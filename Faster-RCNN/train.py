@@ -82,10 +82,6 @@ class Train:
         
         if dataset == "tego":
             self.imdb, self.roidb = load_db("tego_train")
-        elif dataset == "gtea_wholeBB":
-            self.imdb, self.roidb = load_db("gtea_train-wholeBB")
-        elif dataset == "gtea-gaze-plus_wholeBB":
-            self.imdb, self.roidb = load_db("gtea-gaze-plus_train-wholeBB")
         elif dataset == "tego_wholeBB":
             self.imdb, self.roidb = load_db("tego_train-wholeBB")
         elif dataset == "tego_blind":
@@ -245,8 +241,8 @@ class Train:
 def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description='Tensorflow Faster R-CNN training')
-    parser.add_argument('--dataset', dest='dataset', default='gtea',
-                        help='Trained dataset [gtea gtea-gaze-plus tego]')
+    parser.add_argument('--dataset', dest='dataset', default='tego',
+                        help='Trained dataset [tego]')
     args = parser.parse_args()
 
     return args

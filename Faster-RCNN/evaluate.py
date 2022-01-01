@@ -37,23 +37,6 @@ from sklearn.metrics import precision_recall_fscore_support
 
 
 CLASSES = {
-    'gtea': ('none',  # always index 0
-            'box', 'plate', 'spoon', 'coffee', 'bag',
-            'red cup', 'honey', 'ketchup', 'cheese', 'bread bag',
-            'bread', 'hotdog', 'chocolate', 'mayonnaise',
-            'sugar', 'cover', 'tea bag', 'sausage',
-            'peanut', 'jam', 'water', 'mustard'),
-    'gtea-gaze-plus': ('none',  # always index 0
-                    'bacon', 'bottle', 'bowl', 'bread', 'cabinet', 'carrot',
-                    'cereal', 'cheese', 'cheese bag', 'cream cheese', 'cup',
-                    'egg', 'egg box', 'faucet', 'frying pan', 'glove', 'honey',
-                    'jam', 'juice', 'ketchup', 'kettle', 'knife', 'mayonnaise',
-                    'microwave', 'milk', 'mushroom', 'oil', 'onion', 'paper towel',
-                    'pasta box', 'patty', 'peanut butter', 'pepper grinder', 'pizza',
-                    'pizza bag', 'plastic bag', 'plate', 'pot', 'pot cover',
-                    'refrigerator', 'salad dressing', 'salt', 'sausage', 'slice',
-                    'spoon', 'stove', 'tea bag', 'tomato', 'turkey', 'vegetable',
-                    'vinaigrette'),
     'tego': ('none',  # always index 0
             'airborne gum', 'baked cheetos', 'cheerios cereal',
             'diet coke bottle', 'extra dry skin moisturizer',
@@ -62,11 +45,6 @@ CLASSES = {
             'baked lays chips', 'chicken soup can', 'dr pepper can', 
             'great grains cereal', 'hand sanitizer', 'mandarin can',
             'spf55 sunscreen'),
-    'tor-feedback': ('none',  # always index 0
-                    'baking soda', 'caramel coffee', 'cheetos', 'chewy bars',
-                    'chicken broth', 'coca cola', 'diced tomatoes',
-                    'diet coke', 'dill', 'fritos', 'lacroix apricot',
-                    'lacroix mango', 'lays', 'oregano', 'pike place roast')
     }
 
 NETS = {
@@ -74,28 +52,12 @@ NETS = {
   }
 
 DATASETS = {
-  'gtea': ('gtea', 'test_GTEA_voc.txt',),
-  'gtea-gaze-plus': ('gtea-gaze-plus', 'test_GTEA_GAZE_PLUS_voc.txt',),
   'tego': ('tego', 'test_TEgO_voc.txt',),
-  'gtea_wholeBB': ('gtea', 'test_GTEA_voc_wholeBB.txt',),
-  'gtea-gaze-plus_wholeBB': ('gtea-gaze-plus', 'test_GTEA_GAZE_PLUS_voc_wholeBB.txt',),
   'tego_wholeBB': ('tego', 'test_TEgO_voc_wholeBB.txt',),
   'tego_blind': ('tego', 'test_TEgO_blind_voc.txt',),
   'tego_sighted': ('tego', 'test_TEgO_sighted_voc.txt',),
   'tego_blind_wholeBB': ('tego', 'test_TEgO_blind_voc_wholeBB.txt',),
   'tego_sighted_wholeBB': ('tego', 'test_TEgO_sighted_voc_wholeBB.txt',),
-  'tego_nohand': ('tego', 'test_TEgO_nohand_voc.txt',),
-  'tego_nohand_wholeBB': ('tego', 'test_TEgO_nohand_voc_wholeBB.txt',),
-  'tego_testing_nohand': ('tego', 'TEgO_testing_blind_nohand_voc.txt',),
-  'tego_testing_nohand_wholeBB': ('tego', 'TEgO_testing_blind_nohand_voc_wholeBB.txt',),
-  'tor-feedback': ('tor-feedback', 'test_TOR_feedback_voc.txt',),
-  'tor-feedback_wholeBB': ('tor-feedback', 'test_TOR_feedback_voc_wholeBB.txt',),
-  'tor-feedback_hand': ('tor-feedback', 'test_TOR_feedback+hand_voc.txt',),
-  'tor-feedback_hand-wholeBB': ('tor-feedback', 'test_TOR_feedback+hand_voc_wholeBB.txt',),
-  'tor-feedback_noshuffle': ('tor-feedback', 'test_TOR_feedback+noshuffle_voc.txt',),
-  'tor-feedback_noshuffle-wholeBB': ('tor-feedback', 'test_TOR_feedback+noshuffle_voc_wholeBB.txt',),
-  'tor-feedback_hand-noshuffle': ('tor-feedback', 'test_TOR_feedback+hand+noshuffle_voc.txt',),
-  'tor-feedback_hand-noshuffle-wholeBB': ('tor-feedback', 'test_TOR_feedback+hand+noshuffle_voc_wholeBB.txt',),
   }
 
 
@@ -189,7 +151,7 @@ def get_area(bb):
     return w * h
 
 
-def compute_iou_and_iog(gt_bb, est_bb):
+def compute_iou(gt_bb, est_bb):
     # bb = (x1, y1, x2, y2)
     gt_area = get_area(gt_bb)
     est_area = get_area(est_bb)
@@ -203,16 +165,16 @@ def compute_iou_and_iog(gt_bb, est_bb):
     h = np.maximum(0.0, yy2 - yy1 + 1)
     inter_area = w * h
 
-    return inter_area / (gt_area + est_area - inter_area), inter_area / gt_area
+    return inter_area / (gt_area + est_area - inter_area)
 
 
 def keep_closest(dets, gt, thresh=0.5):
     inds = np.where(dets[:, 4] >= thresh)[0]
     if len(inds) == 0:
-        return None, 0, 0
+        return None, 0
     elif len(inds) == 1:
-        iou, iog = compute_iou_and_iog(gt["bbox"], dets[inds[0], :4])
-        return dets[inds[0]], iou, iog
+        iou = compute_iou(gt["bbox"], dets[inds[0], :4])
+        return dets[inds[0]], iou
     else:
         print("more than one estimated bb, so choose one that's closest")
         
@@ -228,8 +190,8 @@ def keep_closest(dets, gt, thresh=0.5):
                 closest_dist = dist
                 closest_i = i
         
-        iou, iog = compute_iou_and_iog(gt_bbox, dets[closest_i, :4])
-        return dets[closest_i], iou, iog
+        iou = compute_iou(gt_bbox, dets[closest_i, :4])
+        return dets[closest_i], iou
 
 
 def evaluate(sess, net, dataset, img_file, voc_file, output_dir, demo_dir):
@@ -271,7 +233,6 @@ def evaluate(sess, net, dataset, img_file, voc_file, output_dir, demo_dir):
     
     est_label = "None"
     ret_iou = 0
-    ret_iog = 0
     whole_dets = None
     for cls_ind, cls in enumerate(CLASSES[DATASETS[dataset][0]][1:]):
         cls_ind += 1  # because we skipped background
@@ -299,12 +260,12 @@ def evaluate(sess, net, dataset, img_file, voc_file, output_dir, demo_dir):
             whole_dets = np.append(whole_dets, dets, axis=0)
     
     if whole_dets is None:
-        return gt_label, est_label, ret_iou, ret_iog
+        return gt_label, est_label, ret_iou
 
     # get only one that is closest to the bounding box
     #print(whole_dets)
     #print(whole_dets.shape)
-    dets, ret_iou, ret_iog = keep_closest(whole_dets, gt, thresh=CONF_THRESH)
+    dets, ret_iou = keep_closest(whole_dets, gt, thresh=CONF_THRESH)
     if dets is not None: # no appropriately estimated label
         # do evaluation
         bbox = dets[:4].astype(int)
@@ -321,7 +282,7 @@ def evaluate(sess, net, dataset, img_file, voc_file, output_dir, demo_dir):
     cv2.imwrite(demo_file, demo)
     print("Output written to {} and {}".format(output_file, demo_file))
     
-    return gt_label, est_label, ret_iou, ret_iog
+    return gt_label, est_label, ret_iou
 
 
 if __name__ == '__main__':
@@ -344,21 +305,7 @@ if __name__ == '__main__':
     
     # model path
     demonet = "vgg16"
-    #dataset = "tego"
-    if "tego" in dataset:
-        if "blind" in dataset or "sighted" in dataset:
-            tfmodel = os.path.join('default', DATASETS[dataset][0], dataset, NETS[demonet][0])
-        elif "wholeBB" in dataset:
-            tfmodel = os.path.join('default', DATASETS[dataset][0], 'wholeBB', NETS[demonet][0])
-        else:
-            tfmodel = os.path.join('default', DATASETS[dataset][0], 'default', NETS[demonet][0])
-    elif "tor-feedback" in dataset:
-        if "hand" in dataset or "noshuffle" in dataset:
-            tfmodel = os.path.join('default', DATASETS[dataset][0], dataset, NETS[demonet][0])
-        elif "wholeBB" in dataset:
-            tfmodel = os.path.join('default', DATASETS[dataset][0], 'wholeBB', NETS[demonet][0])
-        else:
-            tfmodel = os.path.join('default', DATASETS[dataset][0], 'default', NETS[demonet][0])
+    tfmodel = os.path.join('default', DATASETS[dataset][0], dataset, NETS[demonet][0])
 
     if not os.path.isfile(tfmodel + '.meta'):
         print(tfmodel)
@@ -417,24 +364,21 @@ if __name__ == '__main__':
     gt_labels = []
     est_labels = []
     ious = []
-    iogs = []
     for img_file, voc_file in zip(img_files, voc_files):
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('Evaluate for {} with {}'.format(img_file, voc_file))
         assert osp.exists(img_file), "ERROR: {} NOT FOUND".format(img_file)
         assert osp.exists(voc_file), "ERROR: {} NOT FOUND".format(voc_file)
-        gt_label, est_label, iou, iog = evaluate(sess, net, dataset, img_file,\
+        gt_label, est_label, iou = evaluate(sess, net, dataset, img_file,\
                     voc_file, output_dir, demo_dir)
         gt_labels.append(gt_label)
         est_labels.append(est_label)
         ious.append(iou)
-        iogs.append(iog)
         #break
     
     # simple calculation
     prec, rec, f1, _ = precision_recall_fscore_support(gt_labels, est_labels, average="macro")
     miou = sum(ious) / len(ious)
-    miog = sum(iogs) / len(iogs)
     # mAPs
     ap = calculate_map(ious, None)
     ap50 = calculate_map(ious, 0.5)
@@ -444,6 +388,6 @@ if __name__ == '__main__':
     #print(ious)
     print("==============================================================")
     print("Precision: {}, Recall: {}, F1: {}".format(prec, rec, f1))
-    print("mIOU: {}, mIOG: {}".format(miou, miog))
+    print("mIOU: {}".format(miou))
     print("mAP: {}, AP50: {}, AP75: {}".format(ap, ap50, ap75))
     print("Done")

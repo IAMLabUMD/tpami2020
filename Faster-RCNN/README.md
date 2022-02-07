@@ -31,11 +31,11 @@ The code was built using Python 3.7 and Tensorflow 1.14.
   cd lib/utils
   python setup.py build_ext --inplace
   ```
-7. Download the pre-trained VGG16 from [here](http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz) and place it as `data/imagenet_weights/vgg16.ckpt`.
+7. Download the pre-trained VGG16 from [this link](http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz) and place it as `data/imagenet_weights/vgg16.ckpt`.
 
 
 ## Dataset download
-1. Download TEgO dataset from [here](https://drive.google.com/file/d/1iY4KCEDJFQkc-X9UknzWK9WELUisfutl/view?usp=sharing) and place it in the `data` folder.
+1. Download TEgO dataset from [this link](https://drive.google.com/file/d/18CuMGlRzkmN9rouzWA-eql3-Wm1eLw7K/view?usp=sharing) and place it in the `data` folder.
 2. Untar `TEgO_with_VOC.tar.gz` in the `data` folder.
 
 
